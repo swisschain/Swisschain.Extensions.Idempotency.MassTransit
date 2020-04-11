@@ -1,8 +1,7 @@
 ﻿using System.Threading.Tasks;
 using MassTransit;
-using Swisschain.Extensions.Idempotency.Outbox;
 
-namespace Swisschain.Extensions.Idempotency.MassTransit.Outbox
+namespace Swisschain.Extensions.Idempotency.MassTransit
 {
     internal sealed class RootOutboxDispatcher : IOutboxDispatcher
     {
