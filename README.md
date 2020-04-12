@@ -39,7 +39,7 @@ public class ExecuteTransferConsumer : IConsumer<ExecuteTransfer>
 
     public async Task Consume(ConsumeContext<ExecuteTransfer> context)
     {
-        var outbox = _outboxManager.Open();
+        var outbox = _outboxManager.Open($"Commands:ExecuteTransfer:{context.Message.TransferId}");
 
         // Business logic goes here
 
