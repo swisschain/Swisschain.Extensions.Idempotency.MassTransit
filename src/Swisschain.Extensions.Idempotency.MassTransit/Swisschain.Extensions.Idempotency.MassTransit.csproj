@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="MassTransit" Version="7.0.2" />
-    <PackageReference Include="Swisschain.Extensions.Idempotency" Version="1.2.3" />
+    <PackageReference Include="Swisschain.Extensions.Idempotency" Version="2.0.0-beta.13" />
   </ItemGroup>
 
 </Project>

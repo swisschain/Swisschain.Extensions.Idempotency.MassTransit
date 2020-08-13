@@ -4,7 +4,8 @@ namespace Swisschain.Extensions.Idempotency.MassTransit
 {
     public static class OutboxConfigurationBuilderExtensions
     {
-        public static OutboxConfigurationBuilder DispatchWithMassTransit(this OutboxConfigurationBuilder builder)
+        public static IdempotencyConfigurationBuilder<TUnitOfWork> DispatchWithMassTransit<TUnitOfWork>(this IdempotencyConfigurationBuilder<TUnitOfWork> builder) 
+            where TUnitOfWork : UnitOfWorkBase
         {
             builder.Services.AddTransient<IOutboxDispatcher, RootOutboxDispatcher>();
 
