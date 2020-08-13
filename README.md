@@ -7,43 +7,56 @@ MassTransit implementation of the Idempotency extensions
 
 ## Initialization
 
-Add `DispatchWithMassTransit` when configuring `OutboxConfigurationBuilder` inside `services.AddOutbox` call:
+Add `DispatchWithMassTransit` while configuring `IdempotencyConfigurationBuilder` inside `services.AddIdempotency` call:
 
 ```c#
-services.AddOutbox(c =>
+services.AddIdempotency<UnitOfWork>(x =>
 {
-    c.DispatchWithMassTransit();
+    x.DispatchWithMassTransit();
 });
 ```
 
 ## Usage
 
-If you working with the Outbox not in the consumer context (eg. HTTP or gRPC request, or timer), then just call `IOutboxManager.EnsureDispatched` passing the `Outbox` instance:
+### Outside of a consumer context
+
+If you working with the unit of work not in the consumer context (eg. HTTP request, gRPC request, timer), then just call ` IUnitOfWork.EnsureOutboxDispatched()`:
 
 ```c#
-await _outbox.EnsureDispatched(outbox);
+await unitOfWork.EnsureOutboxDispatched();
 ```
 
-If you working with the Outbox in the consumer context (eg. Inside the `IConsumer<T>.Consume`), the it's recommended to pass consumer-scoped dispatcher using `ToOutboxDispatcher` 
-extension method of the `ConsumeContext`:
+### Inside a consumer context
+
+If you working with the unit of work in the consumer context (eg. Inside the `IConsumer<T>.Consume`), then it's recommended to pass consumer-scoped dispatcher using `ToOutboxDispatcher` 
+extension method of the `ConsumeContext` or using `EnsureOutboxDispatched` extension method of the `UnitOfWorkBase`:
 
 ```c#
 public class ExecuteTransferConsumer : IConsumer<ExecuteTransfer>
 {
-    private readonly IOutboxManager _outboxManager;
+    private readonly IUnitOfWorkManager<UnitOfWork> _unitOfWorkManager;
 
-    public BlockchainAddedConsumer(OutboxManager outboxManager)
+    public BlockchainAddedConsumer(IUnitOfWorkManager<UnitOfWork> unitOfWorkManager)
     {
-        _outboxManager = outboxManager;
+        _unitOfWorkManager = unitOfWorkManager;
     }
 
     public async Task Consume(ConsumeContext<ExecuteTransfer> context)
     {
-        var outbox = _outboxManager.Open($"Commands:ExecuteTransfer:{context.Message.TransferId}");
+        await using var unitOfWork = await UnitOfWorkManager.Begin($"Commands:ExecuteTransfer:{context.Message.TransferId}");
 
-        // Business logic goes here
+        if (!unitOfWork.Outbox.IsClosed)
+        {
+            // Business logic goes here
 
-        await _outboxManager.EnsureDispatched(outbox, context.ToOutboxDispatcher());
+            await unitOfWork.Commit();
+        }
+
+        await unitOfWork.EnsureOutboxDispatched(context.ToOutboxDispatcher());
+        
+        // Or (prefed one):
+        
+        await unitOfWork.EnsureOutboxDispatched(context);
     }
 }
 ```
