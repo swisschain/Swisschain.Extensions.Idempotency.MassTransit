@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="MassTransit" Version="7.0.2" />
-    <PackageReference Include="Swisschain.Extensions.Idempotency" Version="2.0.0-beta.13" />
+    <PackageReference Include="Swisschain.Extensions.Idempotency" Version="2.0.0" />
   </ItemGroup>
 
 </Project>
