@@ -1,17 +1,16 @@
-﻿using MassTransit;
+﻿using System.Threading.Tasks;
+using MassTransit;
 
 namespace Swisschain.Extensions.Idempotency.MassTransit
 {
     public static class UnitOfWorkExtensions
     {
-        public static TUnitOfWork EnsureOutboxDispatched<TUnitOfWork>(this TUnitOfWork unitOfWork,
+        public static Task EnsureOutboxDispatched<TUnitOfWork>(this TUnitOfWork unitOfWork,
             ConsumeContext consumeContext)
 
             where TUnitOfWork : UnitOfWorkBase
         {
-            unitOfWork.EnsureOutboxDispatched(consumeContext.ToOutboxDispatcher());
-
-            return unitOfWork;
+            return unitOfWork.EnsureOutboxDispatched(consumeContext.ToOutboxDispatcher());
         }
     }
 }
